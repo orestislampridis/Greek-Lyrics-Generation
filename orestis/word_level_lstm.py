@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import codecs
 import io
 import os
 from create_lstm_model import create_lstm_model
@@ -14,22 +15,32 @@ def train_test_split(sentences_original, next_original, percentage_test=2):
     # shuffle at unison
     print('Shuffling sentences')
 
-    tmp_sentences = []
-    tmp_next_word = []
+    temp_sentences = []
+    temp_next_word = []
     for i in np.random.permutation(len(sentences_original)):
-        tmp_sentences.append(sentences_original[i])
-        tmp_next_word.append(next_original[i])
+        temp_sentences.append(sentences_original[i])
+        temp_next_word.append(next_original[i])
 
     cut_index = int(len(sentences_original) * (1.-(percentage_test/100.)))
-    x_train, x_test = tmp_sentences[:cut_index], tmp_sentences[cut_index:]
-    y_train, y_test = tmp_next_word[:cut_index], tmp_next_word[cut_index:]
+    x_train, x_test = temp_sentences[:cut_index], temp_sentences[cut_index:]
+    y_train, y_test = temp_next_word[:cut_index], temp_next_word[cut_index:]
 
     print("Size of training set = %d" % len(x_train))
     print("Size of test set = %d" % len(y_test))
     return (x_train, y_train), (x_test, y_test)
 
 
-def get_text_data(data_path):
+def write_vocabulary_file(words_file_path, words_set):
+    words_file = codecs.open(words_file_path, 'w', encoding='utf8')
+    for w in words_set:
+        if w != "\n":
+            words_file.write(w+"\n")
+        else:
+            words_file.write(w)
+    words_file.close()
+
+
+def get_text_data(data_path, vocab_file_name):
     sentences = []
     next_words = []
     ignored = 0
@@ -57,6 +68,8 @@ def get_text_data(data_path):
     words = sorted(set(words) - ignored_words)
     print('Number of unique words after ignoring:', len(words))
 
+    write_vocabulary_file(vocab_file_name, words)
+
     word_index = dict((c, i) for i, c in enumerate(words))
     reverse_word_index = dict((i, c) for i, c in enumerate(words))
 
@@ -76,7 +89,11 @@ def get_text_data(data_path):
 
 
 if __name__ == "__main__":
-    text = get_text_data(data_path="data/entexna.txt")
+
+    data_path = "data/entexna.txt"
+    vocab_file = "data/vocab.txt"
+
+    text = get_text_data(data_path=data_path, vocab_file_name=vocab_file)
 
     sentences, words, next_words, word_index, reverse_word_index = text
 

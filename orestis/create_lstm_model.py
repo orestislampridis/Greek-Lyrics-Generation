@@ -66,14 +66,19 @@ def create_lstm_model(words, sentences, next_words, sentences_test, next_words_t
         output_file.write('=' * 80 + '\n')
         output_file.flush()
 
-    model = Sequential()
-    model.add(Bidirectional(LSTM(256), input_shape=(sequence_length, len(words))))
-    if dropout > 0:
-        model.add(Dropout(dropout))
-    model.add(Dense(len(words)))
-    model.add(Activation('softmax'))
+    def create_model():
+        keras_model = Sequential()
+        keras_model.add(Bidirectional(LSTM(256), input_shape=(sequence_length, len(words))))
+        if dropout > 0:
+            keras_model.add(Dropout(dropout))
+        keras_model.add(Dense(len(words)))
+        keras_model.add(Activation('softmax'))
 
-    model.compile(loss='categorical_crossentropy', optimizer="adam", metrics=['accuracy'])
+        keras_model.compile(loss='categorical_crossentropy', optimizer="adam", metrics=['accuracy'])
+
+        return keras_model
+
+    model = create_model()
     print(model.summary())
 
     file_path = "./checkpoints/LSTM_LYRICS-epoch{epoch:03d}-words%d" \
