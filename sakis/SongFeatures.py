@@ -1,5 +1,4 @@
-import os
-import string as s
+import unicodedata
 import pandas as pd
 import numpy as np
 
@@ -23,6 +22,11 @@ SONG_PADDING = "[PAD]"
 SONG_END = "[END]"
 
 
+def strip_accents(input_str):
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+
+
 def read_lyrics_from_string(string):
     try:
         nlp = spacy.load("el_core_news_sm")
@@ -38,14 +42,18 @@ def read_lyrics_from_string(string):
     doc = nlp(sanitized)
     lyrics = []
 
+    # use spacy for sentence segmentation
     for sentence in doc.sents:
         text = sentence.text
+        # use nltk for word tokenization of a sentence
         words = nltk.word_tokenize(text, language="greek")
 
         # remove punctuation
         words = list(filter(lambda it: (it.isdigit() or it.isalpha()), words))
         # to lowercase
         words = list(map(lambda it: it.lower(), words))
+        # remove lang diacritics (NOT USED - diacritics can change semantics)
+        # words = list(map(lambda it: strip_accents(it), words))
 
         lyrics.append(words)
 
@@ -68,6 +76,7 @@ def read_lyrics(path, delimiter='\t', encoding='UTF-8'):
         print("$ python -m spacy download el_core_news_md")
         exit(1)
 
+    # read lyrics csv as dataframe
     data = pd.read_csv(path, delimiter=delimiter, encoding=encoding)
 
     sample_size = len(data.values)
@@ -78,6 +87,7 @@ def read_lyrics(path, delimiter='\t', encoding='UTF-8'):
     for (doc_idx, row) in enumerate(data.values):
         song_lyrics = row[5]
 
+        # force append a period (rare minor issue with spacy)
         if song_lyrics[-1] != ".":
             song_lyrics = song_lyrics + "."
 
@@ -85,16 +95,20 @@ def read_lyrics(path, delimiter='\t', encoding='UTF-8'):
 
         sents = []
 
+        # use spacy for sentence segmentation
         for sentence in doc.sents:
             text = sentence.text
+            # nltk get word tokens
             words = nltk.word_tokenize(text, language="greek")
 
             # remove punctuation
             words = list(filter(lambda it: (it.isdigit() or it.isalpha()), words))
             # to lowercase
             words = list(map(lambda it: it.lower(), words))
+            # remove lang diacritics (NOT USED - diacritics can change semantics)
+            # words = list(map(lambda it: strip_accents(it), words))
 
-            # count word frequencies
+            # count word frequencies and build vocabulary
             for word in words:
 
                 if word not in vocabulary_info.keys():
@@ -112,8 +126,9 @@ def read_lyrics(path, delimiter='\t', encoding='UTF-8'):
 
 
 def lyrics_to_dataset(lyrics, sequence_length):
-    flattened_songs = []  # [[], ""]
+    flattened_songs = []
 
+    # flatten tokens of a song
     for song in lyrics:
         song_words = [SONG_BEGIN]
 
@@ -130,22 +145,30 @@ def lyrics_to_dataset(lyrics, sequence_length):
         # init sequence and next word (X - Y features)
         sequence = []
 
-        for word in song:
+        # for each word build a sequence containing
+        # the next sequence_length tokens
+        for word_idx in range(0, len(song)):
 
-            if len(sequence) < sequence_length:
-                sequence.append(word)
-            else:
-                feature_dataset.append((sequence, word))
-                sequence = [word]
+            for pos_idx in range(word_idx, len(song)):
+                word = song[pos_idx]
 
-        if len(sequence) == 0:
-            continue
+                if len(sequence) < sequence_length:
+                    sequence.append(word)
+                else:
+                    feature_dataset.append((sequence, word))
+                    sequence = [word]
 
-        if len(sequence) < sequence_length and sequence[0] != SONG_END:
-            while len(sequence) < sequence_length:
-                sequence.append(SONG_PADDING)
+            # discard empty sequences
+            if len(sequence) == 0:
+                continue
 
-            feature_dataset.append((sequence, SONG_PADDING))
+            # if a sequence is incomplete and is not just a SONG_END
+            # add padding and append
+            if len(sequence) < sequence_length and sequence[0] != SONG_END:
+                while len(sequence) < sequence_length:
+                    sequence.append(SONG_PADDING)
+
+                feature_dataset.append((sequence, SONG_PADDING))
 
     return feature_dataset
 
@@ -155,7 +178,7 @@ def map_vocabulary(vocabulary):
     ids_map = dict()
 
     # map synthetic words
-    words_map[SONG_PADDING] = 0
+    words_map[SONG_PADDING] = 0  # padding must ALWAYS be zero for keras embedding layer mask requirements
     ids_map[0] = SONG_PADDING
 
     words_map[SONG_BEGIN] = 1
@@ -164,6 +187,7 @@ def map_vocabulary(vocabulary):
     words_map[SONG_END] = 2
     ids_map[2] = SONG_END
 
+    # build a mapping for each token
     for idx, word in enumerate(sorted(vocabulary.keys())):
         word_id = 3 + idx
         words_map[word] = word_id
@@ -175,12 +199,14 @@ def map_vocabulary(vocabulary):
 def transform_encode_dataset(dataset, words_map):
     transformed = []
 
+    # transform each row in the dataset from words to ids
     for row in dataset:
         sequence = row[0]
         next_word = row[1]
 
         transformed_sequence = []
-        transformed_next_word = words_map[next_word]
+        next_word_id = words_map[next_word]
+        transformed_next_word = next_word_id
 
         for word in sequence:
             transformed_sequence.append(words_map[word])
@@ -193,6 +219,7 @@ def transform_encode_dataset(dataset, words_map):
 def transform_decode_dataset(dataset, ids_map):
     transformed = []
 
+    # transform each row in the dataset from ids to words
     for row in dataset:
         sequence = row[0]
         next_word_id = row[1]
@@ -209,6 +236,7 @@ def transform_decode_dataset(dataset, ids_map):
 
 
 def split_train_test(dataset, test_data_ratio=0.3, seed=None):
+    # set seed if needed
     if seed is not None:
         np.random.seed(seed)
 
@@ -228,3 +256,22 @@ def split_train_test(dataset, test_data_ratio=0.3, seed=None):
             train_data.append(row)
 
     return train_data, test_data
+
+
+def vocabulary_frequencies(vocabulary_info):
+    return dict(map(lambda kv: (kv[0], np.sum(kv[1])), vocabulary_info.items()))
+
+
+def vocabulary_frequencies_vector(vocabulary_info, song_count=1150):
+    frequencies = np.zeros([len(vocabulary_info)], dtype=int)
+
+    freq_dict = vocabulary_frequencies(vocabulary_info)
+
+    # calculate synthetic words
+    frequencies[0] = song_count
+    frequencies[1] = song_count
+    frequencies[2] = song_count
+
+    for idx, word in enumerate(sorted(freq_dict.keys())):
+        word_id = 3 + idx
+        frequencies[word_id] = freq_dict[word]
