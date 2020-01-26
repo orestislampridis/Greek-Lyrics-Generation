@@ -14,7 +14,7 @@ def get_from_drive():
   from google.colab import drive
   drive.mount('/content/drive')
   with open('/content/drive/My Drive/Colab Notebooks/entexna.txt', 'r') as f: 
-  text = f.read()
+    text = f.read()
   return text
 
 #Get file from text
@@ -25,7 +25,7 @@ def get_from_git():
   text = open(path_to_file, 'rb').read().decode(encoding='utf-8')
   return text
 
-text=get_from_drive()
+text=get_from_git()
 
 def check_text(t):
   print('the first 100 characters are:',repr(text[:100]))  #read the first 100 characters of doc
