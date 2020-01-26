@@ -76,15 +76,11 @@ n_samples=len(input)
 print("\nNumber of samples:",n_samples)
 
 print('\nReshaping data to feed RNN...')
-#We can use the reshape() function on the NumPy array to reshape this one-dimensional array into a three-dimensional array 
-#with the number of samples and length we need at each time step.
+#We can use the reshape() function on the NumPy array to reshape this one-dimensional array into a two dimensional array 
 inputR=np.reshape(input,(n_samples, seq_length))
 print("The input representation of: ", "".join([int2char[c] for c in input[0][:13]]),"is now:")
 print(inputR[0][:13])
-#We can represent the target variables as binary vectors with One Hot Encoding.
-#"This way me can give RNN a more expressive power to learn a probability-like number for each possible label value. 
-#This can help in both making the problem easier for the network to model. 
-#When a one hot encoding is used for the output variable, it may offer a more nuanced set of predictions than a single label."
+#We represent the target values with One Hot Encoding.
 targetE= np_utils.to_categorical(target)
 print("The target representation of: ",int2char[target[60]]," is now:\n",targetE[60])
 print("/The shape of the input data is:",inputR.shape)
@@ -114,7 +110,7 @@ model.summary()
 print('\n Creating callbacks..')
 
 filepath="/content/drive/My Drive/Colab Notebooks/CheckpointsLyricsGen/epochs:{epoch:03d}-val_acc:{val_acc:.5f}.hdf5"
-# folder called CheckpointsLyricsGen in drive
+#Folder called CheckpointsLyricsGen in drive
 #each file will be stored with epoch number and validation accuracy
 #these files contain weights of your neural network
 
