@@ -20,7 +20,7 @@ def get_from_drive():
 #Get file from text
 def get_from_git():
   #get raw link of data on github
-  url='https://raw.githubusercontent.com/orestislampridis/Greek-Lyric-Generation/master/petros/entexna.txt?token=ANTGNDLJGSZVMFH3ZI6BWOC6GHRZS'
+  url='https://raw.githubusercontent.com/orestislampridis/Greek-Lyric-Generation/master/char_level_lstm/entexna.txt?token=ANTGNDJE42Q36BYI7IFYRZS6G4TE6'
   path_to_file = tf.keras.utils.get_file('shakespeare.txt', url)
   text = open(path_to_file, 'rb').read().decode(encoding='utf-8')
   return text
