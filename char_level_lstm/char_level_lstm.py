@@ -32,7 +32,7 @@ def check_text(t):
   n=len(t)
   print ('Length of text: %i characters' %n) #lenght=number of characters in text
   v=sorted(set(t)) #making the vocabulary of characters
-  n_v=len(vocab) 
+  n_v=len(v) 
   print('number of unique characters: %i' %n)
   return n,v,n_v
 
@@ -99,7 +99,7 @@ model.compile(loss = 'categorical_crossentropy', optimizer = 'adam',metrics=['ac
 #model details
 model.summary()
 
-print('\n Creating callbacks..')
+print('\nCreating callbacks..')
 
 filepath="/content/drive/My Drive/Colab Notebooks/CheckpointsLyricsGen/epochs:{epoch:03d}-val_acc:{val_acc:.5f}.hdf5"
 #Folder called CheckpointsLyricsGen in drive
