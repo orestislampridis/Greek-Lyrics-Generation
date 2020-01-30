@@ -12,7 +12,7 @@ batch_size = 32
 
 
 def validate_seed(vocabulary, seed):
-    """Validate that all the words in the seed are part of the vocabulary"""
+    # Validate that all the words in the seed are part of the vocabulary
     print("\nValidating that all the words in the seed are part of the vocabulary: ")
     seed_words = seed.split(" ")
     valid = True
@@ -40,8 +40,8 @@ def generate_text(model, reverse_word_index, word_index, seed, sequence_length, 
     output = "generated.txt"
     output_file = open(output, "a", encoding="utf-8")
 
-    output_file.write('----- Diversity:' + str(diversity) + '\n')
-    output_file.write('----- Generating with seed:\n"' + ' '.join(sentence) + '"\n')
+    output_file.write('Diversity:' + str(diversity) + '\n')
+    output_file.write('Generating with seed:\n"' + ' '.join(sentence) + '"\n')
     output_file.write(' '.join(sentence))
 
     for i in range(quantity):
