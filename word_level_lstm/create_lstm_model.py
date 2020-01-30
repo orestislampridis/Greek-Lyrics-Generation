@@ -37,7 +37,7 @@ def create_lstm_model(words, sentences, next_words, sentences_test, next_words_t
 
     def on_epoch_end(epoch, logs):
         # Function invoked at end of each epoch. Prints generated text.
-        output_file.write('\n----- Generating text after Epoch: %d\n' % epoch)
+        output_file.write('\nGenerating text after Epoch: %d\n' % epoch)
 
         # Randomly pick a seed sequence
         seed_index = np.random.randint(len(sentences + sentences_test))
@@ -45,8 +45,8 @@ def create_lstm_model(words, sentences, next_words, sentences_test, next_words_t
 
         for diversity in [0.3, 0.4, 0.5, 0.6, 0.7]:
             sentence = seed
-            output_file.write('----- Diversity:' + str(diversity) + '\n')
-            output_file.write('----- Generating with seed:\n"' + ' '.join(sentence) + '"\n')
+            output_file.write('Diversity:' + str(diversity) + '\n')
+            output_file.write('Generating with seed:\n"' + ' '.join(sentence) + '"\n')
             output_file.write(' '.join(sentence))
 
             for i in range(50):
