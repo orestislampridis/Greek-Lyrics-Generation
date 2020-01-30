@@ -73,7 +73,7 @@ def get_text_data(data_path, vocab_file_name):
     word_index = dict((c, i) for i, c in enumerate(words))
     reverse_word_index = dict((i, c) for i, c in enumerate(words))
 
-    # cut the text in semi-redundant sequences of sequence_length words
+    # transform the text in sequences of sequence_length words
     for i in range(0, len(text_in_words) - sequence_length, step):
         # Only add sequences where no word is in ignored_words
         if len(set(text_in_words[i: i + sequence_length + 1]).intersection(ignored_words)) == 0:
