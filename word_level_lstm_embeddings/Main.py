@@ -35,13 +35,17 @@ def train_main():
     # encode words to ids
     dataset = data_transformer.transform_encode(lyrics_dataset.dataset)
     # split dataset to train and test sequences (not used)
-    # train_data, test_data = split_train_test(dataset, test_data_ratio=0.3)
+    #train_data, test_data = split_train_test(dataset, test_data_ratio=0.3)
 
     print("Training...")
     # train the model on ALL the sequences and evaluate
     # on the same data to force the RNN to learn all the
     # sequences, this is a generation effort after all
     lyrics_model.fit(dataset, dataset)
+
+    # train the model on the train sequences
+    # after the first few epochs train on train sequences
+    #lyrics_model.fit(train_data, test_data)
 
     return 0
 
