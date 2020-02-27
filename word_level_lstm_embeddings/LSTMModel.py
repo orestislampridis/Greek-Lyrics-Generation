@@ -6,13 +6,7 @@ from SongFeatures import SONG_BEGIN, SONG_PADDING, SONG_END
 from tensorflow.keras.callbacks import LambdaCallback, ModelCheckpoint, EarlyStopping
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, LSTM, GRU, Bidirectional, Embedding, Flatten
-
-try:
-    import tensorflow as tf
-except ImportError:
-    print("ERROR: TensorFlow is required.")
-    print("Please install TensorFlow.")
-    exit(1)
+import tensorflow as tf
 
 
 class LSTMModel:
@@ -58,6 +52,16 @@ class LSTMModel:
         # categorical dist outputs, that are NOT one-hot encoded
         self.model.compile(loss="sparse_categorical_crossentropy", optimizer="adam",
                            metrics=["sparse_categorical_accuracy"])
+
+        # tf.keras.utils.plot_model(
+        #     self.model,
+        #     to_file='model.png',
+        #     show_shapes=False,
+        #     show_layer_names=False,
+        #     rankdir='TB',
+        #     expand_nested=True,
+        #     dpi=300
+        # )
 
         # name of the checkpoint files
         checkpoint_path = os.path.join(config.checkpoints_path, "checkpoint")
@@ -120,6 +124,7 @@ class LSTMModel:
 
                 # reset index if needed, prevent num overflow
                 # because index++ will go on forever while training
+                # should not be problem but still rest as sanity check
                 if index % sequences_size == sequences_size-1:
                     if is_test:
                         test_index = 0
