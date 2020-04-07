@@ -1,3 +1,9 @@
+"""
+Based on
+https://github.com/keras-team/keras/blob/master/examples/lstm_text_generation.py
+https://github.com/enriqueav/lstm_lyrics/blob/master/lstm_train_embedding.py
+"""
+
 import os
 import numpy as np
 import random
