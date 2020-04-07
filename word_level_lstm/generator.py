@@ -1,3 +1,10 @@
+"""
+Script to generate text from an already trained network
+It is necessary to at least provide the trained model and the vocabulary file
+Based on
+https://github.com/enriqueav/lstm_lyrics/blob/master/generate.py
+"""
+
 import argparse
 import numpy as np
 import re
