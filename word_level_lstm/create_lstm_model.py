@@ -1,3 +1,9 @@
+"""
+Based on
+https://github.com/keras-team/keras/blob/master/examples/lstm_text_generation.py
+https://github.com/enriqueav/lstm_lyrics/blob/master/lstm_train.py
+"""
+
 import numpy as np
 from keras.callbacks import LambdaCallback, ModelCheckpoint, EarlyStopping
 from keras.layers import Dense, Dropout, Activation, LSTM, Bidirectional
