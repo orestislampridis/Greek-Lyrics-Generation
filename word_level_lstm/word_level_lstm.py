@@ -1,3 +1,10 @@
+"""
+Example script to train a network to generate text with the style of a given corpus
+Based on
+https://github.com/keras-team/keras/blob/master/examples/lstm_text_generation.py
+https://github.com/enriqueav/lstm_lyrics/blob/master/lstm_train.py
+"""
+
 from __future__ import print_function
 
 import codecs
