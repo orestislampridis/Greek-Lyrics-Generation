@@ -4,5 +4,7 @@ Implementation of lyric generation machine learning models in the Greek language
 
 First two approaches based on code in [enriqueav's repo](https://github.com/enriqueav/lstm_lyrics).
 
-Joint Work with Athanasios Kefalas(@athankefalas) and Petros Tzallas(@ptzallas)
+Joint Work with with [Athanasios Kefalas](https://github.com/athankefalas) and [Petros Tzallas](https://github.com/ptzallas)
 
+Please cite our paper if you use our work:
+https://link.springer.com/chapter/10.1007/978-3-030-49186-4_37
